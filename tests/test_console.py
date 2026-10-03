@@ -34,6 +34,19 @@ from rich.text import Text
 os.get_terminal_size
 
 
+@pytest.fixture(autouse=True)
+def isolate_terminal_env(monkeypatch):
+    """Remove COLUMNS/LINES from the environment so size tests are independent
+    of the shell that runs the suite (issue #4222).
+
+    CI systems and some terminal multiplexers export COLUMNS/LINES, which
+    takes precedence over the mocked terminal size and breaks the
+    fall-back assertions below.
+    """
+    monkeypatch.delenv("COLUMNS", raising=False)
+    monkeypatch.delenv("LINES", raising=False)
+
+
 def test_dumb_terminal() -> None:
     console = Console(force_terminal=True, _environ={})
     assert console.color_system is not None
