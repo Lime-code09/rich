@@ -397,3 +397,22 @@ def test_recursive_exception() -> None:
             console.print_exception(show_locals=True)
 
     bar()
+
+
+def test_syntax_error_with_non_string_message():
+    """A SyntaxError whose msg is a non-string (e.g. ParseError(ExpatError)) must render without raising (issue #4225)."""
+    import io
+    from xml.etree.ElementTree import ParseError
+    from xml.parsers.expat import ExpatError
+
+    from rich.console import Console
+    from rich.traceback import Traceback
+
+    buffer = io.StringIO()
+    try:
+        raise ParseError(ExpatError("syntax error"))
+    except ParseError:
+        console = Console(file=buffer)
+        console.print(Traceback.from_exception(*sys.exc_info()))
+    output = buffer.getvalue()
+    assert "ExpatError" in output
