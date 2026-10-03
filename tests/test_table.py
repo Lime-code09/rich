@@ -1,6 +1,7 @@
 # encoding=utf-8
 
 import io
+from copy import copy
 from textwrap import dedent
 
 import pytest
@@ -307,8 +308,9 @@ def test_section():
 def test_placement_table_box_elements(show_header, show_footer, expected):
     """Ensure box drawing characters correctly positioned."""
 
+    # use a copy so we never mutate the shared box.ASCII singleton (issue #4223)
     table = Table(
-        box=box.ASCII, show_header=show_header, show_footer=show_footer, padding=0
+        box=copy(box.ASCII), show_header=show_header, show_footer=show_footer, padding=0
     )
 
     # content rows indicated by numerals, pure dividers by letters
