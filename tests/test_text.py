@@ -1127,3 +1127,14 @@ def test_soft_wrap_styled() -> None:
     # Background is reset before \n
     expected = "\x1b[34;47msoft wrap is on\x1b[0m\nNext line\n"
     assert output == expected
+
+
+def test_highlight_words_empty_iterable_is_noop():
+    """An empty word iterable must be a no-op: return 0, no spans (issue #4229)."""
+    text = Text("abc")
+    count = text.highlight_words([], "red")
+    assert count == 0
+    assert text._spans == []
+    # a generator that yields nothing must also be safe
+    count2 = Text("abc").highlight_words(iter([]), "bold")
+    assert count2 == 0
